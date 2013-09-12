@@ -57,6 +57,7 @@ class MandrillFormController extends BaseController
 			
 			// Handle mandrill response			
 			craft()->userSession->setFlash('status', $result[0]['status']);
+			craft()->userSession->setError($result[0]['reject_reason']);
 			
 			if (($successRedirectUrl = craft()->request->getPost('successRedirectUrl', null)) != null)
 			{
