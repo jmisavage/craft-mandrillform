@@ -1,0 +1,29 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.textField({
+	label: "To Email"|t,
+	id: 'emailRecipient',
+	name: 'emailRecipient',
+	instructions: "The email address that the contact form will send to."|t,
+	value: settings.emailRecipient,
+	autofocus: true,
+	errors: settings.getErrors('emailRecipient')
+}) }}
+
+{{ forms.textField({
+	label: "API Key"|t,
+	id: 'apiKey',
+	name: 'apiKey',
+	instructions: "Mandrill API Key."|t,
+	value: settings.apiKey,
+	errors: settings.getErrors('apiKey')
+}) }}
+
+{{ forms.textField({
+	label: "Subject Text"|t,
+	id: 'emailSubject',
+	name: 'emailSubject',
+	instructions: "Text that will be the email’s subject."|t,
+	value: (settings.emailSubject ? settings.emailSubject : "New message from {siteName}"|t({ siteName: craft.app.siteName })),
+	errors: settings.getErrors('emailSubject')
+}) }}
