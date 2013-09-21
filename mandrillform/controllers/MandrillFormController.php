@@ -34,40 +34,71 @@ class MandrillFormController extends BaseController
 		}
 		else
 		{
-			// include mandrill api class
+			// Include Mandrill API SDK
 			require_once(CRAFT_PLUGINS_PATH.'mandrillform/vendor/Mandrill.php');		
 		
 			$api = new \Mandrill($settings->apiKey);
+
+			// construct model
+			$formData = new MandrillFormModel();
+			$formData->fromEmail = craft()->request->getPost('fromEmail');
+			$formData->fromName = craft()->request->getPost('fromName', '');
+			$formData->subject = $settings->emailSubject;
+			$formData->message = craft()->request->getPost('message');
+
+			// Mandrill status responses
+			$messageStatus = 'unknown';
+			$rejectReason = null;
 			
-			// construct api call
-			$message = array(
-				'text'			=> craft()->request->getPost('message'),
-				'subject'		=> $settings->emailSubject,
-				'from_email'	=> craft()->request->getPost('fromEmail'),
-				'from_name'		=> craft()->request->getPost('fromName'),
-				'to'			=> array(
-					array(
-						'email'	=> $settings->emailRecipient
+			if ($formData->validate())
+			{
+				// Configure Mandrill Message Object
+				$message = array(
+					'text'			=> $formData->message,
+					'subject'		=> $formData->subject,
+					'from_email'	=> $formData->fromEmail,
+					'from_name'		=> $formData->fromName,
+					'to'			=> array(
+						array(
+							'email'	=> $settings->emailRecipient
+						)
 					)
-				)
-			);
-			
-			$async = false;
-			$result = $api->messages->send($message, $async);
-			
-			// Handle mandrill response			
-			craft()->userSession->setFlash('status', $result[0]['status']);
-			craft()->userSession->setError($result[0]['reject_reason']);
-			
-			if (($successRedirectUrl = craft()->request->getPost('successRedirectUrl', null)) != null)
-			{
-				$this->redirect($successRedirectUrl);
+				);
+
+				try
+				{
+					// Mandrip API Message Send(settings, async, ...)
+					$result = $api->messages->send($message, false);
+
+					// craft messages/variables
+					$messageStatus = $result[0]['status'];
+					$rejectReason = $result[0]['reject_reason'];
+
+					craft()->userSession->setNotice('Your message has been ' . $messageStatus);
+
+					if (($successRedirectUrl = craft()->request->getPost('successRedirectUrl', null)) != null)
+					{
+						$this->redirect($successRedirectUrl);
+					}
+					else
+					{
+						$this->redirectToPostedUrl();
+					}
+				}
+				catch (\Mandrill_Error $e)
+				{
+					Craft::log('A mandrill error occured: ' . get_class($e) . ' - ' . $e->getMessage(), LogLevel::Error);
+					craft()->userSession->setError(Craft::t('Couldn’t send email. Check your settings.'));
+					$this->redirectToPostedUrl();
+				}
 			}
-			else
-			{
-				$this->redirectToPostedUrl();
-			}
+
+			craft()->urlManager->setRouteVariables(array(
+				'message'		=> $formData,
+				'status'		=> $messageStatus,
+				'rejectReason'	=> $rejectReason
+			));
 		}
 	}
-	
+
 }

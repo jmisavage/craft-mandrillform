@@ -10,7 +10,7 @@ class MandrillFormPlugin extends BasePlugin
 
 	function getVersion()
 	{
-		return '0.5.0';
+		return '0.6';
 	}
 
 	function getDeveloper()
