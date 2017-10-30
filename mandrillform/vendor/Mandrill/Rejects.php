@@ -11,12 +11,14 @@ add manually will never expire and there is no reputation penalty
 for removing them from your blacklist. Attempting to blacklist an
 address that has been whitelisted will have no effect.
      * @param string $email an email address to block
+     * @param string $comment an optional comment describing the rejection
+     * @param string $subaccount an optional unique identifier for the subaccount to limit the blacklist entry
      * @return struct a status object containing the address and the result of the operation
      *     - email string the email address you provided
      *     - added boolean whether the operation succeeded
      */
-    public function add($email) {
-        $_params = array("email" => $email);
+    public function add($email, $comment=null, $subaccount=null) {
+        $_params = array("email" => $email, "comment" => $comment, "subaccount" => $subaccount);
         return $this->master->call('rejects/add', $_params);
     }
 
@@ -27,10 +29,11 @@ entries that have expired are excluded from the results; set
 include_expired to true to include them.
      * @param string $email an optional email address to search by
      * @param boolean $include_expired whether to include rejections that have already expired.
+     * @param string $subaccount an optional unique identifier for the subaccount to limit the blacklist
      * @return array Up to 1000 rejection entries
      *     - return[] struct the information for each rejection blacklist entry
      *         - email string the email that is blocked
-     *         - reason string the type of event (hard-bounce, soft-bounce, spam, unsub) that caused this rejection
+     *         - reason string the type of event (hard-bounce, soft-bounce, spam, unsub, custom) that caused this rejection
      *         - detail string extended details about the event, such as the SMTP diagnostic for bounces or the comment for manually-created rejections
      *         - created_at string when the email was added to the blacklist
      *         - last_event_at string the timestamp of the most recent event that either created or renewed this rejection
@@ -49,9 +52,10 @@ include_expired to true to include them.
      *             - clicks integer the total number of times tracked URLs in messages by this sender have been clicked
      *             - unique_opens integer the number of unique opens for emails sent for this sender
      *             - unique_clicks integer the number of unique clicks for emails sent for this sender
+     *         - subaccount string the subaccount that this blacklist entry applies to, or null if none.
      */
-    public function getList($email=null, $include_expired=false) {
-        $_params = array("email" => $email, "include_expired" => $include_expired);
+    public function getList($email=null, $include_expired=false, $subaccount=null) {
+        $_params = array("email" => $email, "include_expired" => $include_expired, "subaccount" => $subaccount);
         return $this->master->call('rejects/list', $_params);
     }
 
@@ -60,12 +64,14 @@ include_expired to true to include them.
 you can remove from your blacklist, but keep in mind that each deletion
 has an affect on your reputation.
      * @param string $email an email address
+     * @param string $subaccount an optional unique identifier for the subaccount to limit the blacklist deletion
      * @return struct a status object containing the address and whether the deletion succeeded.
      *     - email string the email address that was removed from the blacklist
      *     - deleted boolean whether the address was deleted successfully.
+     *     - subaccount string the subaccount blacklist that the address was removed from, if any
      */
-    public function delete($email) {
-        $_params = array("email" => $email);
+    public function delete($email, $subaccount=null) {
+        $_params = array("email" => $email, "subaccount" => $subaccount);
         return $this->master->call('rejects/delete', $_params);
     }
 

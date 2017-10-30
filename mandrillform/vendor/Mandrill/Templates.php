@@ -14,9 +14,13 @@ class Mandrill_Templates {
      * @param string $code the HTML code for the template with mc:edit attributes for the editable elements
      * @param string $text a default text part to be used when sending with this template
      * @param boolean $publish set to false to add a draft template without publishing
+     * @param array $labels an optional array of up to 10 labels to use for filtering templates
+     *     - labels[] string a single label
      * @return struct the information saved about the new template
      *     - slug string the immutable unique code name of the template
      *     - name string the name of the template
+     *     - labels array the list of labels applied to the template
+     *         - labels[] string a single label
      *     - code string the full HTML code of the template, with mc:edit attributes marking the editable elements - draft version
      *     - subject string the subject line of the template, if provided - draft version
      *     - from_email string the default sender address for the template, if provided - draft version
@@ -32,8 +36,8 @@ class Mandrill_Templates {
      *     - created_at string the date and time the template was first created as a UTC string in YYYY-MM-DD HH:MM:SS format
      *     - updated_at string the date and time the template was last modified as a UTC string in YYYY-MM-DD HH:MM:SS format
      */
-    public function add($name, $from_email=null, $from_name=null, $subject=null, $code=null, $text=null, $publish=true) {
-        $_params = array("name" => $name, "from_email" => $from_email, "from_name" => $from_name, "subject" => $subject, "code" => $code, "text" => $text, "publish" => $publish);
+    public function add($name, $from_email=null, $from_name=null, $subject=null, $code=null, $text=null, $publish=true, $labels=array()) {
+        $_params = array("name" => $name, "from_email" => $from_email, "from_name" => $from_name, "subject" => $subject, "code" => $code, "text" => $text, "publish" => $publish, "labels" => $labels);
         return $this->master->call('templates/add', $_params);
     }
 
@@ -43,6 +47,8 @@ class Mandrill_Templates {
      * @return struct the requested template information
      *     - slug string the immutable unique code name of the template
      *     - name string the name of the template
+     *     - labels array the list of labels applied to the template
+     *         - labels[] string a single label
      *     - code string the full HTML code of the template, with mc:edit attributes marking the editable elements - draft version
      *     - subject string the subject line of the template, if provided - draft version
      *     - from_email string the default sender address for the template, if provided - draft version
@@ -72,9 +78,13 @@ class Mandrill_Templates {
      * @param string $code the new code for the template
      * @param string $text the new default text part to be used
      * @param boolean $publish set to false to update the draft version of the template without publishing
+     * @param array $labels an optional array of up to 10 labels to use for filtering templates
+     *     - labels[] string a single label
      * @return struct the template that was updated
      *     - slug string the immutable unique code name of the template
      *     - name string the name of the template
+     *     - labels array the list of labels applied to the template
+     *         - labels[] string a single label
      *     - code string the full HTML code of the template, with mc:edit attributes marking the editable elements - draft version
      *     - subject string the subject line of the template, if provided - draft version
      *     - from_email string the default sender address for the template, if provided - draft version
@@ -90,8 +100,8 @@ class Mandrill_Templates {
      *     - created_at string the date and time the template was first created as a UTC string in YYYY-MM-DD HH:MM:SS format
      *     - updated_at string the date and time the template was last modified as a UTC string in YYYY-MM-DD HH:MM:SS format
      */
-    public function update($name, $from_email=null, $from_name=null, $subject=null, $code=null, $text=null, $publish=true) {
-        $_params = array("name" => $name, "from_email" => $from_email, "from_name" => $from_name, "subject" => $subject, "code" => $code, "text" => $text, "publish" => $publish);
+    public function update($name, $from_email=null, $from_name=null, $subject=null, $code=null, $text=null, $publish=true, $labels=null) {
+        $_params = array("name" => $name, "from_email" => $from_email, "from_name" => $from_name, "subject" => $subject, "code" => $code, "text" => $text, "publish" => $publish, "labels" => $labels);
         return $this->master->call('templates/update', $_params);
     }
 
@@ -101,6 +111,8 @@ class Mandrill_Templates {
      * @return struct the template that was published
      *     - slug string the immutable unique code name of the template
      *     - name string the name of the template
+     *     - labels array the list of labels applied to the template
+     *         - labels[] string a single label
      *     - code string the full HTML code of the template, with mc:edit attributes marking the editable elements - draft version
      *     - subject string the subject line of the template, if provided - draft version
      *     - from_email string the default sender address for the template, if provided - draft version
@@ -127,6 +139,8 @@ class Mandrill_Templates {
      * @return struct the template that was deleted
      *     - slug string the immutable unique code name of the template
      *     - name string the name of the template
+     *     - labels array the list of labels applied to the template
+     *         - labels[] string a single label
      *     - code string the full HTML code of the template, with mc:edit attributes marking the editable elements - draft version
      *     - subject string the subject line of the template, if provided - draft version
      *     - from_email string the default sender address for the template, if provided - draft version
@@ -149,10 +163,13 @@ class Mandrill_Templates {
 
     /**
      * Return a list of all the templates available to this user
+     * @param string $label an optional label to filter the templates
      * @return array an array of structs with information about each template
      *     - return[] struct the information on each template in the account
      *         - slug string the immutable unique code name of the template
      *         - name string the name of the template
+     *         - labels array the list of labels applied to the template
+     *             - labels[] string a single label
      *         - code string the full HTML code of the template, with mc:edit attributes marking the editable elements - draft version
      *         - subject string the subject line of the template, if provided - draft version
      *         - from_email string the default sender address for the template, if provided - draft version
@@ -168,8 +185,8 @@ class Mandrill_Templates {
      *         - created_at string the date and time the template was first created as a UTC string in YYYY-MM-DD HH:MM:SS format
      *         - updated_at string the date and time the template was last modified as a UTC string in YYYY-MM-DD HH:MM:SS format
      */
-    public function getList() {
-        $_params = array();
+    public function getList($label=null) {
+        $_params = array("label" => $label);
         return $this->master->call('templates/list', $_params);
     }
 

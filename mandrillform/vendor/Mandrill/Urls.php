@@ -49,6 +49,60 @@ class Mandrill_Urls {
         return $this->master->call('urls/time-series', $_params);
     }
 
+    /**
+     * Get the list of tracking domains set up for this account
+     * @return array the tracking domains and their status
+     *     - return[] struct the individual tracking domain
+     *         - domain string the tracking domain name
+     *         - created_at string the date and time that the tracking domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - last_tested_at string when the domain's DNS settings were last tested as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - cname struct details about the domain's CNAME record
+     *             - valid boolean whether the domain's CNAME record is valid for use with Mandrill
+     *             - valid_after string when the domain's CNAME record will be considered valid for use with Mandrill as a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
+     *             - error string an error describing the CNAME record, or null if the record is correct
+     *         - valid_tracking boolean whether this domain can be used as a tracking domain for email.
+     */
+    public function trackingDomains() {
+        $_params = array();
+        return $this->master->call('urls/tracking-domains', $_params);
+    }
+
+    /**
+     * Add a tracking domain to your account
+     * @param string $domain a domain name
+     * @return struct information about the domain
+     *     - domain string the tracking domain name
+     *     - created_at string the date and time that the tracking domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - last_tested_at string when the domain's DNS settings were last tested as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - cname struct details about the domain's CNAME record
+     *         - valid boolean whether the domain's CNAME record is valid for use with Mandrill
+     *         - valid_after string when the domain's CNAME record will be considered valid for use with Mandrill as a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
+     *         - error string an error describing the CNAME record, or null if the record is correct
+     *     - valid_tracking boolean whether this domain can be used as a tracking domain for email.
+     */
+    public function addTrackingDomain($domain) {
+        $_params = array("domain" => $domain);
+        return $this->master->call('urls/add-tracking-domain', $_params);
+    }
+
+    /**
+     * Checks the CNAME settings for a tracking domain. The domain must have been added already with the add-tracking-domain call
+     * @param string $domain an existing tracking domain name
+     * @return struct information about the tracking domain
+     *     - domain string the tracking domain name
+     *     - created_at string the date and time that the tracking domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - last_tested_at string when the domain's DNS settings were last tested as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - cname struct details about the domain's CNAME record
+     *         - valid boolean whether the domain's CNAME record is valid for use with Mandrill
+     *         - valid_after string when the domain's CNAME record will be considered valid for use with Mandrill as a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
+     *         - error string an error describing the CNAME record, or null if the record is correct
+     *     - valid_tracking boolean whether this domain can be used as a tracking domain for email.
+     */
+    public function checkTrackingDomain($domain) {
+        $_params = array("domain" => $domain);
+        return $this->master->call('urls/check-tracking-domain', $_params);
+    }
+
 }
 
 

@@ -17,6 +17,7 @@ class Mandrill_Messages {
      *         - to[] struct a single recipient's information.
      *             - email string the email address of the recipient
      *             - name string the optional display name to use for the recipient
+     *             - type string the header type to use for the recipient, defaults to "to" if not provided
      *     - headers struct optional extra headers to add to the message (most headers are allowed)
      *     - important boolean whether or not this message is important, and should be delivered ahead of non-important messages
      *     - track_opens boolean whether or not to turn on open tracking for the message
@@ -32,17 +33,18 @@ class Mandrill_Messages {
      *     - signing_domain string a custom domain to use for SPF/DKIM signing instead of mandrill (for "via" or "on behalf of" in email clients)
      *     - return_path_domain string a custom domain to use for the messages's return-path
      *     - merge boolean whether to evaluate merge tags in the message. Will automatically be set to true if either merge_vars or global_merge_vars are provided.
+     *     - merge_language string the merge tag language to use when evaluating merge tags, either mailchimp or handlebars
      *     - global_merge_vars array global merge variables to use for all recipients. You can override these per recipient.
      *         - global_merge_vars[] struct a single global merge variable
      *             - name string the global merge variable's name. Merge variable names are case-insensitive and may not start with _
-     *             - content string the global merge variable's content
+     *             - content mixed the global merge variable's content
      *     - merge_vars array per-recipient merge variables, which override global merge variables with the same name.
      *         - merge_vars[] struct per-recipient merge variables
      *             - rcpt string the email address of the recipient that the merge variables should apply to
      *             - vars array the recipient's merge variables
      *                 - vars[] struct a single merge variable
      *                     - name string the merge variable's name. Merge variable names are case-insensitive and may not start with _
-     *                     - content string the merge variable's content
+     *                     - content mixed the merge variable's content
      *     - tags array an array of string to tag the message with.  Stats are accumulated using tags, though we only store the first 100 we see, so this should not be unique or change frequently.  Tags should be 50 characters or less.  Any tags starting with an underscore are reserved for internal use and will cause errors.
      *         - tags[] string a single tag - must not start with an underscore
      *     - subaccount string the unique id of a subaccount for this message - must already exist or will fail with an error
@@ -66,11 +68,11 @@ class Mandrill_Messages {
      * @param boolean $async enable a background sending mode that is optimized for bulk sending. In async mode, messages/send will immediately return a status of "queued" for every recipient. To handle rejections when sending in async mode, set up a webhook for the 'reject' event. Defaults to false for messages with no more than 10 recipients; messages with more than 10 recipients are always sent asynchronously, regardless of the value of async.
      * @param string $ip_pool the name of the dedicated ip pool that should be used to send the message. If you do not have any dedicated IPs, this parameter has no effect. If you specify a pool that does not exist, your default pool will be used instead.
      * @param string $send_at when this message should be sent as a UTC timestamp in YYYY-MM-DD HH:MM:SS format. If you specify a time in the past, the message will be sent immediately. An additional fee applies for scheduled email, and this feature is only available to accounts with a positive balance.
-     * @return array of structs for each recipient containing the key "email" with the email address and "status" as either "sent", "queued", or "rejected"
+     * @return array of structs for each recipient containing the key "email" with the email address, and details of the message status for that recipient
      *     - return[] struct the sending results for a single recipient
      *         - email string the email address of the recipient
      *         - status string the sending status of the recipient - either "sent", "queued", "scheduled", "rejected", or "invalid"
-     *         - reject_reason string the reason for the rejection if the recipient status is "rejected"
+     *         - reject_reason string the reason for the rejection if the recipient status is "rejected" - one of "hard-bounce", "soft-bounce", "spam", "unsub", "custom", "invalid-sender", "invalid", "test-mode-limit", or "rule"
      *         - _id string the message's unique id
      */
     public function send($message, $async=false, $ip_pool=null, $send_at=null) {
@@ -95,6 +97,7 @@ class Mandrill_Messages {
      *         - to[] struct a single recipient's information.
      *             - email string the email address of the recipient
      *             - name string the optional display name to use for the recipient
+     *             - type string the header type to use for the recipient, defaults to "to" if not provided
      *     - headers struct optional extra headers to add to the message (most headers are allowed)
      *     - important boolean whether or not this message is important, and should be delivered ahead of non-important messages
      *     - track_opens boolean whether or not to turn on open tracking for the message
@@ -110,17 +113,18 @@ class Mandrill_Messages {
      *     - signing_domain string a custom domain to use for SPF/DKIM signing instead of mandrill (for "via" or "on behalf of" in email clients)
      *     - return_path_domain string a custom domain to use for the messages's return-path
      *     - merge boolean whether to evaluate merge tags in the message. Will automatically be set to true if either merge_vars or global_merge_vars are provided.
+     *     - merge_language string the merge tag language to use when evaluating merge tags, either mailchimp or handlebars
      *     - global_merge_vars array global merge variables to use for all recipients. You can override these per recipient.
      *         - global_merge_vars[] struct a single global merge variable
      *             - name string the global merge variable's name. Merge variable names are case-insensitive and may not start with _
-     *             - content string the global merge variable's content
+     *             - content mixed the global merge variable's content
      *     - merge_vars array per-recipient merge variables, which override global merge variables with the same name.
      *         - merge_vars[] struct per-recipient merge variables
      *             - rcpt string the email address of the recipient that the merge variables should apply to
      *             - vars array the recipient's merge variables
      *                 - vars[] struct a single merge variable
      *                     - name string the merge variable's name. Merge variable names are case-insensitive and may not start with _
-     *                     - content string the merge variable's content
+     *                     - content mixed the merge variable's content
      *     - tags array an array of string to tag the message with.  Stats are accumulated using tags, though we only store the first 100 we see, so this should not be unique or change frequently.  Tags should be 50 characters or less.  Any tags starting with an underscore are reserved for internal use and will cause errors.
      *         - tags[] string a single tag - must not start with an underscore
      *     - subaccount string the unique id of a subaccount for this message - must already exist or will fail with an error
@@ -144,11 +148,11 @@ class Mandrill_Messages {
      * @param boolean $async enable a background sending mode that is optimized for bulk sending. In async mode, messages/send will immediately return a status of "queued" for every recipient. To handle rejections when sending in async mode, set up a webhook for the 'reject' event. Defaults to false for messages with no more than 10 recipients; messages with more than 10 recipients are always sent asynchronously, regardless of the value of async.
      * @param string $ip_pool the name of the dedicated ip pool that should be used to send the message. If you do not have any dedicated IPs, this parameter has no effect. If you specify a pool that does not exist, your default pool will be used instead.
      * @param string $send_at when this message should be sent as a UTC timestamp in YYYY-MM-DD HH:MM:SS format. If you specify a time in the past, the message will be sent immediately. An additional fee applies for scheduled email, and this feature is only available to accounts with a positive balance.
-     * @return array of structs for each recipient containing the key "email" with the email address and "status" as either "sent", "queued", "scheduled", or "rejected"
+     * @return array of structs for each recipient containing the key "email" with the email address, and details of the message status for that recipient
      *     - return[] struct the sending results for a single recipient
      *         - email string the email address of the recipient
      *         - status string the sending status of the recipient - either "sent", "queued", "rejected", or "invalid"
-     *         - reject_reason string the reason for the rejection if the recipient status is "rejected"
+     *         - reject_reason string the reason for the rejection if the recipient status is "rejected" - one of "hard-bounce", "soft-bounce", "spam", "unsub", "custom", "invalid-sender", "invalid", "test-mode-limit", or "rule"
      *         - _id string the message's unique id
      */
     public function sendTemplate($template_name, $template_content, $message, $async=false, $ip_pool=null, $send_at=null) {
@@ -157,8 +161,8 @@ class Mandrill_Messages {
     }
 
     /**
-     * Search the content of recently sent messages and optionally narrow by date range, tags and senders
-     * @param string $query the search terms to find matching messages for
+     * Search recently sent messages and optionally narrow by date range, tags, senders, and API keys. If no date range is specified, results within the last 7 days are returned. This method may be called up to 20 times per minute. If you need the data more often, you can use <a href="/api/docs/messages.html#method=info">/messages/info.json</a> to get the information for a single message, or <a href="http://help.mandrill.com/entries/21738186-Introduction-to-Webhooks">webhooks</a> to push activity to your own application for querying.
+     * @param string $query <a href="http://help.mandrill.com/entries/22211902">search terms</a> to find matching messages
      * @param string $date_from start date
      * @param string $date_to end date
      * @param array $tags an array of tag names to narrow the search to, will return messages that contain ANY of the tags
@@ -171,7 +175,7 @@ class Mandrill_Messages {
      *         - _id string the message's unique id
      *         - sender string the email address of the sender
      *         - template string the unique name of the template used, if any
-     *         - subject string the message's subject link
+     *         - subject string the message's subject line
      *         - email string the recipient email address
      *         - tags array list of tags on this message
      *             - tags[] string individual tag on this message
@@ -237,7 +241,7 @@ class Mandrill_Messages {
      *     - _id string the message's unique id
      *     - sender string the email address of the sender
      *     - template string the unique name of the template used, if any
-     *     - subject string the message's subject link
+     *     - subject string the message's subject line
      *     - email string the recipient email address
      *     - tags array list of tags on this message
      *         - tags[] string individual tag on this message
@@ -267,6 +271,34 @@ class Mandrill_Messages {
     public function info($id) {
         $_params = array("id" => $id);
         return $this->master->call('messages/info', $_params);
+    }
+
+    /**
+     * Get the full content of a recently sent message
+     * @param string $id the unique id of the message to get - passed as the "_id" field in webhooks, send calls, or search calls
+     * @return struct the content of the message
+     *     - ts integer the Unix timestamp from when this message was sent
+     *     - _id string the message's unique id
+     *     - from_email string the email address of the sender
+     *     - from_name string the alias of the sender (if any)
+     *     - subject string the message's subject line
+     *     - to struct the message recipient's information
+     *         - email string the email address of the recipient
+     *         - name string the alias of the recipient (if any)
+     *     - tags array list of tags on this message
+     *         - tags[] string individual tag on this message
+     *     - headers struct the key-value pairs of the custom MIME headers for the message's main document
+     *     - text string the text part of the message, if any
+     *     - html string the HTML part of the message, if any
+     *     - attachments array an array of any attachments that can be found in the message
+     *         - attachments[] struct information about an individual attachment
+     *             - name string the file name of the attachment
+     *             - type string the MIME type of the attachment
+     *             - content string the content of the attachment as a base64 encoded string
+     */
+    public function content($id) {
+        $_params = array("id" => $id);
+        return $this->master->call('messages/content', $_params);
     }
 
     /**
@@ -311,11 +343,11 @@ class Mandrill_Messages {
      * @param string $ip_pool the name of the dedicated ip pool that should be used to send the message. If you do not have any dedicated IPs, this parameter has no effect. If you specify a pool that does not exist, your default pool will be used instead.
      * @param string $send_at when this message should be sent as a UTC timestamp in YYYY-MM-DD HH:MM:SS format. If you specify a time in the past, the message will be sent immediately.
      * @param string $return_path_domain a custom domain to use for the messages's return-path
-     * @return array of structs for each recipient containing the key "email" with the email address and "status" as either "sent", "queued", or "rejected"
+     * @return array of structs for each recipient containing the key "email" with the email address, and details of the message status for that recipient
      *     - return[] struct the sending results for a single recipient
      *         - email string the email address of the recipient
      *         - status string the sending status of the recipient - either "sent", "queued", "scheduled", "rejected", or "invalid"
-     *         - reject_reason string the reason for the rejection if the recipient status is "rejected"
+     *         - reject_reason string the reason for the rejection if the recipient status is "rejected" - one of "hard-bounce", "soft-bounce", "spam", "unsub", "custom", "invalid-sender", "invalid", "test-mode-limit", or "rule"
      *         - _id string the message's unique id
      */
     public function sendRaw($raw_message, $from_email=null, $from_name=null, $to=null, $async=false, $ip_pool=null, $send_at=null, $return_path_domain=null) {
@@ -324,7 +356,7 @@ class Mandrill_Messages {
     }
 
     /**
-     * Queries your scheduled emails by sender or recipient, or both.
+     * Queries your scheduled emails.
      * @param string $to an optional recipient address to restrict results to
      * @return array a list of up to 1000 scheduled emails
      *     - return[] struct a scheduled email

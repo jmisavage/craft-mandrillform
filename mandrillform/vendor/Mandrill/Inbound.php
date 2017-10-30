@@ -19,16 +19,99 @@ class Mandrill_Inbound {
     }
 
     /**
+     * Add an inbound domain to your account
+     * @param string $domain a domain name
+     * @return struct information about the domain
+     *     - domain string the domain name that is accepting mail
+     *     - created_at string the date and time that the inbound domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - valid_mx boolean true if this inbound domain has successfully set up an MX record to deliver mail to the Mandrill servers
+     */
+    public function addDomain($domain) {
+        $_params = array("domain" => $domain);
+        return $this->master->call('inbound/add-domain', $_params);
+    }
+
+    /**
+     * Check the MX settings for an inbound domain. The domain must have already been added with the add-domain call
+     * @param string $domain an existing inbound domain
+     * @return struct information about the inbound domain
+     *     - domain string the domain name that is accepting mail
+     *     - created_at string the date and time that the inbound domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - valid_mx boolean true if this inbound domain has successfully set up an MX record to deliver mail to the Mandrill servers
+     */
+    public function checkDomain($domain) {
+        $_params = array("domain" => $domain);
+        return $this->master->call('inbound/check-domain', $_params);
+    }
+
+    /**
+     * Delete an inbound domain from the account. All mail will stop routing for this domain immediately.
+     * @param string $domain an existing inbound domain
+     * @return struct information about the deleted domain
+     *     - domain string the domain name that is accepting mail
+     *     - created_at string the date and time that the inbound domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - valid_mx boolean true if this inbound domain has successfully set up an MX record to deliver mail to the Mandrill servers
+     */
+    public function deleteDomain($domain) {
+        $_params = array("domain" => $domain);
+        return $this->master->call('inbound/delete-domain', $_params);
+    }
+
+    /**
      * List the mailbox routes defined for an inbound domain
      * @param string $domain the domain to check
      * @return array the routes associated with the domain
      *     - return[] struct the individual mailbox route
+     *         - id string the unique identifier of the route
      *         - pattern string the search pattern that the mailbox name should match
      *         - url string the webhook URL where inbound messages will be published
      */
     public function routes($domain) {
         $_params = array("domain" => $domain);
         return $this->master->call('inbound/routes', $_params);
+    }
+
+    /**
+     * Add a new mailbox route to an inbound domain
+     * @param string $domain an existing inbound domain
+     * @param string $pattern the search pattern that the mailbox name should match
+     * @param string $url the webhook URL where the inbound messages will be published
+     * @return struct the added mailbox route information
+     *     - id string the unique identifier of the route
+     *     - pattern string the search pattern that the mailbox name should match
+     *     - url string the webhook URL where inbound messages will be published
+     */
+    public function addRoute($domain, $pattern, $url) {
+        $_params = array("domain" => $domain, "pattern" => $pattern, "url" => $url);
+        return $this->master->call('inbound/add-route', $_params);
+    }
+
+    /**
+     * Update the pattern or webhook of an existing inbound mailbox route. If null is provided for any fields, the values will remain unchanged.
+     * @param string $id the unique identifier of an existing mailbox route
+     * @param string $pattern the search pattern that the mailbox name should match
+     * @param string $url the webhook URL where the inbound messages will be published
+     * @return struct the updated mailbox route information
+     *     - id string the unique identifier of the route
+     *     - pattern string the search pattern that the mailbox name should match
+     *     - url string the webhook URL where inbound messages will be published
+     */
+    public function updateRoute($id, $pattern=null, $url=null) {
+        $_params = array("id" => $id, "pattern" => $pattern, "url" => $url);
+        return $this->master->call('inbound/update-route', $_params);
+    }
+
+    /**
+     * Delete an existing inbound mailbox route
+     * @param string $id the unique identifier of an existing route
+     * @return struct the deleted mailbox route information
+     *     - id string the unique identifier of the route
+     *     - pattern string the search pattern that the mailbox name should match
+     *     - url string the webhook URL where inbound messages will be published
+     */
+    public function deleteRoute($id) {
+        $_params = array("id" => $id);
+        return $this->master->call('inbound/delete-route', $_params);
     }
 
     /**
