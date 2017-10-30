@@ -237,6 +237,43 @@ name, no action will be performed.
         return $this->master->call('ips/delete-pool', $_params);
     }
 
+    /**
+     * Tests whether a domain name is valid for use as the custom reverse
+DNS for a dedicated IP.
+     * @param string $ip a dedicated ip address
+     * @param string $domain the domain name to test
+     * @return struct validation results for the domain
+     *     - valid string whether the domain name has a correctly-configured A record pointing to the ip address
+     *     - error string if valid is false, this will contain details about why the domain's A record is incorrect
+     */
+    public function checkCustomDns($ip, $domain) {
+        $_params = array("ip" => $ip, "domain" => $domain);
+        return $this->master->call('ips/check-custom-dns', $_params);
+    }
+
+    /**
+     * Configures the custom DNS name for a dedicated IP.
+     * @param string $ip a dedicated ip address
+     * @param string $domain a domain name to set as the dedicated IP's custom dns name.
+     * @return struct information about the dedicated IP's new configuration
+     *     - ip string the ip address
+     *     - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - pool string the name of the pool that this dedicated IP belongs to
+     *     - domain string the domain name (reverse dns) of this dedicated IP
+     *     - custom_dns struct information about the ip's custom dns, if it has been configured
+     *         - enabled boolean a boolean indicating whether custom dns has been configured for this ip
+     *         - valid boolean whether the ip's custom dns is currently valid
+     *         - error string if the ip's custom dns is invalid, this will include details about the error
+     *     - warmup struct information about the ip's warmup status
+     *         - warming_up boolean whether the ip is currently in warmup mode
+     *         - start_at string the start time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
+     */
+    public function setCustomDns($ip, $domain) {
+        $_params = array("ip" => $ip, "domain" => $domain);
+        return $this->master->call('ips/set-custom-dns', $_params);
+    }
+
 }
 
 

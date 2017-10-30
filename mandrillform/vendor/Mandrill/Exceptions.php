@@ -59,6 +59,11 @@ class Mandrill_Unknown_Sender extends Mandrill_Error {}
 class Mandrill_Unknown_Url extends Mandrill_Error {}
 
 /**
+ * The provided tracking domain does not exist.
+ */
+class Mandrill_Unknown_TrackingDomain extends Mandrill_Error {}
+
+/**
  * The given template name already exists or contains invalid characters
  */
 class Mandrill_Invalid_Template extends Mandrill_Error {}
@@ -74,6 +79,11 @@ class Mandrill_Unknown_Webhook extends Mandrill_Error {}
 class Mandrill_Unknown_InboundDomain extends Mandrill_Error {}
 
 /**
+ * The provided inbound route does not exist.
+ */
+class Mandrill_Unknown_InboundRoute extends Mandrill_Error {}
+
+/**
  * The requested export job does not exist
  */
 class Mandrill_Unknown_Export extends Mandrill_Error {}
@@ -87,6 +97,16 @@ class Mandrill_IP_ProvisionLimit extends Mandrill_Error {}
  * The provided dedicated IP pool does not exist.
  */
 class Mandrill_Unknown_Pool extends Mandrill_Error {}
+
+/**
+ * The user hasn't started sending yet.
+ */
+class Mandrill_NoSendingHistory extends Mandrill_Error {}
+
+/**
+ * The user's reputation is too low to continue.
+ */
+class Mandrill_PoorReputation extends Mandrill_Error {}
 
 /**
  * The provided dedicated IP does not exist.
@@ -107,5 +127,25 @@ class Mandrill_Invalid_DeleteDefaultPool extends Mandrill_Error {}
  * Non-empty pools cannot be deleted.
  */
 class Mandrill_Invalid_DeleteNonEmptyPool extends Mandrill_Error {}
+
+/**
+ * The domain name is not configured for use as the dedicated IP's custom reverse DNS.
+ */
+class Mandrill_Invalid_CustomDNS extends Mandrill_Error {}
+
+/**
+ * A custom DNS change for this dedicated IP is currently pending.
+ */
+class Mandrill_Invalid_CustomDNSPending extends Mandrill_Error {}
+
+/**
+ * Custom metadata field limit reached.
+ */
+class Mandrill_Metadata_FieldLimit extends Mandrill_Error {}
+
+/**
+ * The provided metadata field name does not exist.
+ */
+class Mandrill_Unknown_MetadataField extends Mandrill_Error {}
 
 

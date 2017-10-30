@@ -63,11 +63,11 @@ MandrillForm for Craft is very similar to Pixel & Tonic's ContactForm plugin, bu
 
 ## Roadmap
 
-Right now I've built this plugin very quickly to meet the very specific needs of another project I'm working on.  So I've done the bare minimum to get this working, but the more I interact with Mandrill, the more I like the service so I definately plan on extending the functionality.
+Right now I've built this plugin very quickly to meet the very specific needs of another project I'm working on.  So I've done the bare minimum to get this working, but the more I interact with Mandrill, the more I like the service so I definitely plan on extending the functionality.
 
 - [ ] Robust error handling
 - [ ] Tags
 - [ ] Better examples (especially AJAX form submissions)
 
 ## Special Notes
-This plugin currently includes v1.0.46 of the Official Mandrill API Client for PHP.  The latest wrapper can be found on [this packagist repo](https://packagist.org/packages/mandrill/mandrill).
+This plugin currently includes v1.0.55 of the Official Mandrill API Client for PHP.  The latest wrapper can be found on [this packagist repo](https://packagist.org/packages/mandrill/mandrill).
