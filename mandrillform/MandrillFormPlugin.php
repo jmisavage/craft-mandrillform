@@ -20,7 +20,7 @@ class MandrillFormPlugin extends BasePlugin
 
 	function getDeveloperUrl()
 	{
-		return 'http://idlehamster.com';
+		return 'https://jeremymisavage.com';
 	}
 
 	protected function defineSettings()
